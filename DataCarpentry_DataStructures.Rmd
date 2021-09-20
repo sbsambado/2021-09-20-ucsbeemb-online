@@ -18,7 +18,7 @@ output: html_document
 
 **note: feel free to ask questions at any point in the lecture**
 
->[link to R for Reproducible Scientific Analysis](https://swcarpentry.github.io/r-novice-gapminder/05-data-structures-part2/)
+>[link to R for Reproducible Scientific Analysis](https://swcarpentry.github.io/r-novice-gapminder/04-data-structures-part1/index.html)
 
 
 
@@ -51,11 +51,11 @@ output: html_document
 + Each **value** has its own **cell**
 
 
-*note*
+*note*: I tend to use a certain type of language while live coding 
 
-function(argument)
++ function(argument) 
 
-HINT: DATASET, COLUMN, VARIABLE, OBSERVATION
++ HINT: DATASET, COLUMN, VARIABLE, OBSERVATION
 
 
 
@@ -90,13 +90,14 @@ write.csv(x = cats, # data
           row.names = FALSE) # give row number
 
 
+
 # Dataframe 2 -- gapminder (from Carpentries)
 
 gapminder <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder_data.csv", stringsAsFactors = TRUE) 
 
 ```
 
-**Check in: Off the top of your head, what type of data are in each column?**
+**Check in: Off the top of your head, what type of data are in each column of cats dataframe?**
 
 
 ## Dataframes & Vectors -- common data structures in ecology
@@ -121,6 +122,7 @@ What if we want to check this with R?
 
 
 # use as.logical() function
+
 
 # Note: what's the difference between assigning a vector vs. typing command?
 
