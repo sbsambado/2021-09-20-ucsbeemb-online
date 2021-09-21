@@ -1,0 +1,310 @@
+---
+title: "DataCarpentry_Day2_ExploringDataframes"
+author: "Imani Russell"
+date: "9/21/2021"
+output: html_document
+---
+
+# Adding columns and rows in data frames
+
+REMEMBER: data frame columns = vectors
++ add a new column by creating a vector
+
+## Columns
+```{r}
+# create a new vector
+age <- c(2, 3, 5)
+
+# reload cats dataframe
+cats <- data.frame(coat = c("calico", "black", "tabby"), 
+                    weight = c(2.1, 5.0, 3.2), 
+                    likes_string = c(1, 0, 1)) 
+
+cats
+
+# add new column to cats
+cbind (cats, age)
+
+# REVIEW: what happens if we try to add this vector as a new column?
+age <- c(2, 3, 5, 2)
+cbind (cats, age)
+
+# check number of rows in cats
+nrow(cats)
+dim(cats)
+
+# check length of age (nrow vs length)
+length(age)
+
+# overwrite old cats dataframe with new one including age
+age <- c(2, 3, 5) # reassign age
+
+cats <- cbind (cats, age)
+```
+
+
+## Adding rows
+
+Each row = a list (*lists have elements of different types vs vectors = same data type)
+```{r}
+# create a new list
+newRow <- list ("tortoiseshell", 3.3, TRUE, 9)
+
+# add new row to dataframe
+cats <- rbind (cats, newRow) # warnings vs errors
+
+cats
+```
+
+Why do we get NA instead of tortoiseshell?
+
+# Factors
+
+Factor = data type in which each value represents a level
+
+Here, coat = factor with 3 levels: "black", "calico", "tabby".
+
++ R will only accept values that match one of these levels
++ Solution: add "tortoiseshell" as a possible factor level
+
+```{r}
+# check how many levels are in the factor coat 
+levels(cats$coat)
+
+# add "tortoiseshell"
+levels(cats$coat) <- c(levels(cats$coat), "tortoiseshell")
+
+# add new row to dataframe
+cats <- rbind (cats, list ("tortoiseshell", 3.3, TRUE, 9))
+```
+
+ALTERNATIVE: change cats$coat from factor to character
+
++ PRO: can add any word to the column
++ CON: lose handy categories/functionality of factors
+```{r}
+# check to see class of coat variable
+str(cats) 
+class(cats$coat) # if you don't want to see the class of everything or detail
+#typeof(cats$coat)
+
+# reassign as character
+cats$coat <- as.character(cats$coat)
+
+str(cats)
+```
+
+
+CHALLENGE 1:
+1 cat year = 7 human years
+
+1) create a vector called human_age by multiplying cat$age by 7
+2) convert human_age to a factor
+3) convert human_age back to a numeric vector using as.numeric(). Divide that by 7 to get the original ages back. Explain what happened.
+
+
+
+```{r}
+# 1
+human_age <- cats$age * 7
+str(human_age)
+class(human_age)
+
+# 2
+human_age <- factor(human_age)
+human_age <- as.factor(human_age) 
+human_age <- as.character(human_age)
+
+str(human_age)
+
+# 3
+human_age <- as.numeric(human_age)
+str(human_age)
+
+# look back and compare original human_age with current
+# 1 2 3 4 4 4 were originally the factors, which are stored as integers, with labels = the values (here, 28, 35, 56, and 63)
+# changing factors to numeric returns the underlying integers and not the values/labels we're interested in
+# to return the original numbers, we should convert human_age to class character (as.character()) and then to numeric.
+
+human_age / 7
+
+# when using read.csv(), remember to set your argument stringsAsFactors = FALSE to prevent typos from affecting your factor conversions
+```
+
+
+
+# Removing Rows
+
+Look back at cats dataframe - we now have an extra row we don't need. Let's remove it!
+```{r}
+cats
+
+cats [-4, ] # [row, column] remove the 4th row but leave columns alone
+
+cats [ c(-4, -5), ] # remove rows 4 and 5
+
+na.omit (cats) # remove all rows with NAs - be careful using this function!!!
+
+# reassign dataframe so we save our changes
+cats <- na.omit (cats)
+```
+
+
+# Removing columns
+
+```{r}
+# remove age column
+cats [, -4] # keep all rows but remove column 4
+
+# alternative
+drop <- names (cats) %in% c("age") # do any data frame column names appear in "age"? or whatever word you enter
+
+cats [, !drop] # return all rows and all columns that are not TRUE in drop (remember TRUE = 1, FALSE = 0)
+```
+
+
+# Appending to a data frame
+
+Can also bind 2 data frames together using rbind()
+```{r}
+cats <- rbind (cats, cats)
+cats
+
+rownames(cats)
+
+# rownames get a little crazy - remove them and let R rename them sequentially
+rownames(cats) <- NULL
+
+cats
+```
+
+CHALLENGE 2: 
+
+You can use the  following syntax to create a dataframe:
+
+df <- data.frame(id = c("a", "b", "c"),
+                 x = 1:3,
+                 y = c(TRUE, TRUE, FALSE),
+                 stringsAsFactors = FALSE)
+                 
+Make a data frame that holds the following information:
+
++ first name
++ last name
++ lucky number
+
+Use rbind() to add an entry for someone else (family member, someone else in the workshop, etc!).
+
+Use cbind() to add a column with each person's answer to the question: "Is it time for a coffee break?"
+
+```{r}
+df <- data.frame(first = c("Grace"),
+                 last = c("Hopper"),
+                 lucky_number = c(0),
+                 stringsAsFactors = FALSE)
+df <- rbind(df, list("Marie", "Curie", 238) )
+df <- cbind(df, coffeetime = c(TRUE,TRUE))
+```
+
+
+# Realistic example
+
+Read in the gapminder dataset
+```{r}
+gapminder <- read.csv ("data/gapminder_data.csv", stringsAsFactors = FALSE)
+
+# if you weren't here yesterday!
+gapminder <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder_data.csv", stringsAsFactors = TRUE) 
+```
+
+let's explore the data a little bit!
+```{r}
+str(gapminder) # review
+
+summary(gapminder) # returns a few summary statistics/descriptive summary
+
+# factors: by number of items in each level
+# numeric: quartiles, mean, etc
+# character: length, class, mode
+
+# you can check summary for vectors too
+summary (gapminder$country)
+
+
+# look at individual columns
+typeof(gapminder$year) # what does R see this as?
+class(gapminder$year) # what do functions read this as?
+
+typeof(gapminder$country)
+
+str(gapminder$country) 
+
+# double check dimensions, etc
+length(gapminder) # gives number of columns, not rows!
+
+typeof(gapminder) # remember, dataframe = list of vectors and factors
+
+ncol(gapminder) # does the same thing - number of columns
+
+colnames(gapminder) # what are these column names?
+
+nrow(gapminder) # number of rows
+
+dim(gapminder) # both! remember: rows, columns
+```
+
+CHALLENGE 3:
+
+It’s good practice to also check the last few lines of your data and some in the middle. How would you do this?
+
+Searching for ones specifically in the middle isn’t too hard, but we could ask for a few lines at random. How would you code this?
+
+```{r}
+# check last 6 (default)
+tail(gapminder)
+
+
+# check last 15
+tail(gapminder, n = 15)
+
+
+
+# get a few random lines
+gapminder[sample(nrow(gapminder), 5), ] # nested function:P function passed as an argument to another function
+
+# within gapminder, we want the full rows that meet the following conditions:
+# we want those rows to be a random sample, taken across all possible rows of gapminder
+
+# may help to break down into parts:
+# gapminder[x, ]
+# gapminder[sample (x), ]
+# gapminder[sample (nrow (x), 5), ]
+```
+
+**There are often multiple ways to do the same thing in R!**
+
+
+CHALLENGE 4
+
+Go to file -> new file -> R script, and write an R script to load in the gapminder dataset. Put it in the scripts/ directory and add it to version control.
+
+Run the script using the source function, using the file path as its argument (or by pressing the “source” button in RStudio).
+
+```{r}
+source(file = "scripts/load-gapminder.R")
+```
+
+
+
+
+CHALLLENGE 5
+
+Read the output of str(gapminder) again; this time, use what you’ve learned about factors, lists and vectors, as well as the output of functions like colnames and dim to explain what everything that str prints out for gapminder means. If there are any parts you can’t interpret, discuss with your neighbors!
+
+
+
+
+
+
+
+
