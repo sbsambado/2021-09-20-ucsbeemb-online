@@ -5,6 +5,7 @@ date: "9/21/2021"
 output: html_document
 ---
 
+
 # Adding columns and rows in data frames
 
 REMEMBER: data frame columns = vectors
