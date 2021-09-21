@@ -22,7 +22,7 @@ output:
 + Debrief  
 
 
->[link to R for Reproducible Scientific Analysis](https://swcarpentry.github.io/r-novice-gapminder/13-dplyr/index.html)
+>[link to R for Reproducible Scientific Analysis material](https://swcarpentry.github.io/r-novice-gapminder/13-dplyr/index.html)
 
 
 *heads up*: I tend to use a certain type of language while live coding 
@@ -46,8 +46,6 @@ output:
 ### Step Up
 
 ```{r setup, include=FALSE}
-
-knitr::opts_chunk$set(echo = TRUE) 
 
 # necessary packages
 
@@ -77,8 +75,17 @@ mean(gapminder[gapminder$continent == "Africa", "gdpPercap"])
 ```
 
 #### The dplyr way 
+```{r}
+gapminder %>%
+  filter(continent == "Africa") %>%
+  summarize(mean_gdp = mean(gdpPercap))
 
-**5 common functions**
+```
+
+*Question: Which method, base or dplyr, makes most sense to you?*
+
+
+**5 common functions of dplyr**
 
 a) select() -- to choose variables from a dataframe
 

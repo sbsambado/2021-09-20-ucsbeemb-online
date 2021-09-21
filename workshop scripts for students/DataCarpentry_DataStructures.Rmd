@@ -2,13 +2,17 @@
 title: "Data Structures"
 author: "sbsambado"
 date: "9/20/2021"
-output: html_document
+output:
+    html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
 ---
 
 ## Data Structures - Software Carpentry Workshop
 
 
-### Agenda 
+#### Agenda 
 
 + Big picture
 + Set up
@@ -22,7 +26,7 @@ output: html_document
 
 
 
-#### Big Picture
+### Big Picture
 
 + there is so much data in this world! However, *only some of it is useful* for your question
 + to make data useful for you, *you will have to manipulate it* 
@@ -60,7 +64,7 @@ output: html_document
 
 
 
-#### Set Up
+### Set Up
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -101,6 +105,8 @@ gapminder <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-ga
 
 **Check in: Off the top of your head, what type of data are in each column of cats dataframe?**
 
+
+### Tools & Exercises
 
 ## Dataframes & Vectors -- common data structures in ecology
 
@@ -289,7 +295,7 @@ cats[1,] # what do you think? everythin in row 1
 
 ## Let's try these techiques with more realistic data (aka gapminder)
 
-#### Questions 
+### Questions 
 
 We will use these **functions** within the package `base`
 a. dim()
@@ -389,7 +395,7 @@ head(ordered_gapminder, n = 2)
 
 
 
-## Debrief
+### Debrief
 
 + If you are given a dataset, you should know **how to start to looking** at data
   + e.g. dim(), str()
