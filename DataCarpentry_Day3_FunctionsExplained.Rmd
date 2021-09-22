@@ -1,0 +1,207 @@
+---
+title: "DataCarpentry_Day3_FunctionsExplained"
+author: "tatum katz"
+date: "9/22/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+## Functions Explain -- Software Carpentry Lesson
+
+Notes
+
++ functions give us a name we can use again
++ define set of input, know what output looks like
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Dataframe 2 -- gapminder (from Carpentries)
+
+gapminder <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder_data.csv", stringsAsFactors = TRUE) 
+
+
+```
+
+
+### Basics of functions
+```{r}
+fahr_to_kelvin <- function(temp) { # name the function, identify the arguments
+  kelvin <- ((temp - 32)) * (5/9) + 273.15 # actual function
+  return(kelvin) # return a result
+}
+
+
+fahr_to_kelvin(32)
+
+## Challenge 1
+# Write a function called kelvin_to_celsius() that takes a temperature in Kelvin and returns that temperature in Celsius.
+
+kelvin_celsius <- function(temp){
+  celsius <- ((temp - 273.15))
+  return(celsius)
+}
+
+kelvin_celsius(284)
+
+
+## Challenge 2
+# Define the function to convert directly from Fahrenheit to Celsius, by reusing the two functions above (or using your own functions if you prefer).
+
+
+fahr_celsius <- function(temp){
+  temp_kelvin <- fahr_to_kelvin(temp)
+  result <- kelvin_celsius(temp_kelvin)
+  return(result)
+}
+
+
+fahr_celsius(120)
+
+```
+
+
+
+### Defensive programming
+
++ prevent issues from occuring
+```{r}
+# let's make fahr_to_kelvin more defensible
+
+fahr_to_kelvin <- function(temp) { # name the function, identify the arguments
+  if(!is.numeric(temp)){ # temp must be numeric
+    stop("temp must be a numeric vector")
+  }
+  kelvin <- ((temp - 32)) * (5/9) + 273.15 # actual function
+  return(kelvin) # return a result
+}
+
+# test it
+
+fahr_to_kelvin('32') # wrong
+fahr_to_kelvin(32) # right
+
+
+# second modification -- stop if not
+
+fahr_to_kelvin <- function(temp) { # name the function, identify the arguments
+  stopifnot(is.numeric(temp))
+  kelvin <- ((temp - 32)) * (5/9) + 273.15 # actual function
+  return(kelvin) # return a result
+}
+
+
+##  Challenge 3
+# Use defensive programming to ensure that our fahr_to_celsius() function throws an error immediately if the argument temp is specified inappropriately.
+
+fahr_celsius <- function(temp){
+  stopifnot(is.numeric(temp))
+  temp_kelvin <- fahr_to_kelvin(temp)
+  result <- kelvin_celsius(temp_kelvin)
+  return(result)
+}
+
+fahr_celsius('g') # test 
+```
+
+### Combining functions
+```{r}
+
+calcGDP <- function(dat) {
+  gdp <- dat$pop * dat$gdpPercap
+  return(gdp)
+}
+
+calcGDP(head(gapminder)) # this is useless, let's build it up
+
+
+
+# build up 
+
+calcGDP <- function(dat, year = NULL, country = NULL) { # create the function, null are default
+  # arguments:
+  # dat: required! a dataset with pop and gdpPercap
+  # year: optional, a numeric vector, a year
+  # country: opetion, character vector, a country
+  if(!is.null(year)) { # if year is specified
+    dat <- dat[dat$year %in% year, ] # subset out just the user-specified year
+  }
+  if(!is.null(country)) { # if country is specified
+    dat <- dat[dat$country %in% country,] # and, if so, subset out just that country 
+  }
+  
+  gdp <- dat$pop * dat$gdpPercap # then, calculate the gdp for each row in the subset
+  new <- cbind(dat, gdp = gdp) # stick that gdp on as a new column in the dataset
+  return(new) # return your enw dataframe with the gdp
+}
+
+calcGDP(dat = gapminder, year = 2002) # all countries in 2002
+
+calcGDP(dat = gapminder, year = 2002, country = 'Afghanistan')
+```
+
+### How to use source
+```{r}
+source("functions/functions-lessons.R") # all your functions can be uploaded
+
+calcGDP(gapminder, year = 1997)
+
+```
+
+
+More notes:
+
++ vectors in functions only exist in functions, not global environment
++ subset data within function are considered passby values
+
+
+Challenge 4: Test out your GDP function by calculating the GDP for New Zealand in 1987. How does this differ from New Zealand’s GDP in 1952?
+
+```{r}
+# long version
+calcGDP(gapminder, country = "New Zealand", year = 1987)
+calcGDP(gapminder, country = "New Zealand", year = 1952)
+
+# short version
+
+calcGDP(gapminder, year = c(1952, 1987), country = "New Zealand")
+
+
+
+```
+
+Challenge 5: The paste() function can be used to combine text together, e.g:
+```{r}
+# paste function is used to combine text together
+
+best_practice <- c("Write", "programs", "for", "people", "not", "computers")
+paste(best_practice, collapse=" ")
+
+# Write a function called fence() that takes two vectors as arguments, called text and wrapper, and prints out the text wrapped with the wrapper:
+
+fence <- function(text, wrapper) {
+  text <- c(wrapper, text, wrapper)
+  output <- paste0(text, collapse = " ") # paste0 pastes together with no spaces, collapse gives one long string
+  return(output)
+}
+
+fence(text=best_practice, wrapper="***")
+
+
+fence(text = "this is so freakin fun", wrapper = "!!!!")
+
+
+```
+
+When you first start out, your workflow will probably look a lot like this:
+
+1. Write a function
+2. Comment parts of the function to document its behaviour
+3. Load in the source file
+4. Experiment with it in the console to make sure it behaves as you expect
+5. Make any necessary bug fixes
+6. Rinse and repeat.
+
