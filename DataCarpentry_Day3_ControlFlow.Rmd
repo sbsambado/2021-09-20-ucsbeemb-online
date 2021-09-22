@@ -1,0 +1,262 @@
+---
+title: "DataCarpentry_Day4_ControlFlow"
+author: "sbsambado"
+date: "9/22/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# necessary dataframes
+
+  # Dataframe 1 -- from Carpentry
+gapminder <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder_data.csv", stringsAsFactors = TRUE) 
+```
+Spacing is everything - find a format that works for you!
+
+Notes:
+
++ need a boolean statement
++ condition in ( )
++ make sure output for every condition
+
+# if
+if (condition is true) {
+  perform action
+}
+
+
+Or if you have multiple conditions
+
+# if ... else
+if (condition is true) {
+  perform action
+} else {  # that is, if the condition is false,
+  perform alternative action
+}
+
+
+### If statements
+```{r}
+x <- 8
+
+if (x >= 10) { # has to evaluate to TRUE/FALSE
+  print("x is greater than or equal to 10") 
+  } else{ # for TRUE condition
+  print("x is less than 10")
+}
+
+x
+
+
+# want to throw in a 3 rd condition, make sure to add condition () after else if statements
+
+if (x >= 10) { # has to evaluate to TRUE/FALSE
+  print("x is greater than or equal to 10") 
+  } else if (x > 5){ # for TRUE condition
+  print("x is less than 5")
+  }
+
+
+# situationally dependent, order matters
+
+  
+  
+x <- 4 == 3 # doubel equals means ASK A QUESTION
+x <- FALSE
+x <- TRUE
+
+if(x) {
+  "4 equals 3" # if x is TRUE
+} else {
+  "4 does not equal 3" # if x is FALSE, we'll get this statement
+}
+
+
+```
+
+Challenge 1: Use an if() statement to print a suitable message reporting whether there are any records from 2002 in the gapminder dataset. Now do the same for 2012.
+
+```{r}
+dim(gapminder[(gapminder$year == 2002),]) # index it
+
+# ^ that prints years, but we want a statement
+
+rows2002_number <- nrow(gapminder[(gapminder$year == 2002),])
+
+
+rows2002_number >= 1 # make into a boolean statement
+
+
+# slow way -- evaluating all of the rows
+
+if(nrow(gapminder[(gapminder$year == 2002),]) >= 1) {
+  print("redcords for year 2002 found")
+}
+
+
+# faster way -- evaluating all of the rows
+
+if(any(gapminder$year == 2002)) { # any() asks a TRUE/FALSE
+  print("redcords for year 2002 found")
+}
+  
+# what tatum would have done  
+
+if(gapminder$year == 2002){
+    print("redcords for year 2002 found")
+} # can't simply give a vector of booleans, need a single boolean
+
+
+
+ifelse() # R special
+
+# ifelse(condition, true action, false action) 
+
+y <- -3
+ifelse(y < 0, "y is neg", "y is pos or 0")
+
+# you can than start nesting these ifelse conditions!
+
+
+all(gapminder$year == 2002) # not every value is TRUE -> gives false
+any(gapminder$year == 2002) # at least one value is TRUE -> gives TRUE
+  
+```
+
+
+### Repeating observations - eliminate the copy and paste!
+
+for (iterator in set of values) {
+  do a thing
+  then, update the iterator variable & start over
+}
+
+```{r}
+
+# basic
+for(i in 1:10) { # has to be a set, can't be a single number
+  print(i) # print value of i
+}
+
+
+# slightly less basic, nested for loops
+# i, j, k for nested alphabet
+
+for(i in 1:5) { # set i to 1 
+  for(j in c("a", "b","c", 'd', 'e')) { # set j to a, j updates first
+    print(paste(i,j))
+  }
+}
+
+# we think it's going to be 1a but inner most loop goes first
+# inner loops go thorugh all iterations
+# THEN update the outer loop
+
+# good test: set your iterator variable to one number or value, and run line by line
+
+output_vector <- c() # create empty vector that's waiting to be filled
+
+
+for(i in 1:5) {
+for(j in c("a", "b","c", 'd', 'e')) { 
+  temp_output <- paste(i,j) 
+  output_vector <- c(output_vector, temp_output) # growing your result for smaller observations < 1000
+}
+}
+
+# temp output will have the last value 
+
+
+#### better option: create slots to fill
+
+# make cubbies first and then fill with shoes
+
+output_matrix <- matrix(nrow = 5, ncol = 5)
+
+# speed it up by making j vector
+j_vector <- c("a", "b","c", 'd', 'e')
+
+for(i in 1:5) {
+for(j in 1:5) { 
+  temp_j_value <- j_vector[j] # j takes on each value of j_vector
+  temp_output <- paste(i,temp_j_value)  
+  output_matrix[i,j] <- temp_output
+}
+}
+
+output_matrix # matrix could be helpful if you're trying to fill out a whole dataframe
+
+# but we want vector
+
+output_vector2 <- as.vector(output_matrix)
+
+```
+
+general work flow
+
+1. set up cubbyholes (make a vector or matrix of right size, filled with NA)
+
+2. then, in the for loop, fill each cubbyhole with a value based on the index 
+
+
+### Do While loops
+
+while(this condition is TRUE) {
+do the thing
+}
+
+```{r}
+z <- 1
+while(z > 0.1) { # going to keep doing this forever until condiition is met
+  z <- runif(1) # draw 1 random number from standard uniform
+  cat(z, "/n") # mix of paste and print, /n is new line
+}
+
+
+```
+
+Challenge 2: Compare the objects output_vector and output_vector2. Are they the same? If not, why not? How would you change the last block of code to make output_vector2 the same as output_vector?
+
+```{r}
+
+```
+
+
+Challenge 3: Write a script that loops through the gapminder data by continent and prints out whether the mean life expectancy is smaller or larger than 50 years.
+```{r}
+
+## one way to solve this
+
+
+for(icontininent in unique(gapminder$continent)) { # select unique values of continent
+  tmp <- gapminder[gapminder$continent == icontininent,] # create temporary variable storing subset
+  cat(icontininent, mean(tmp$lifeExp, na.rm = TRUE), "\n") # return calculated life exp
+  rm(tmp)
+}
+
+
+threshold <- 50
+
+for(icontininent in unique(gapminder$continent)) {
+  tmp <- mean(gapminder[gapminder$continent == icontininent, "lifeExp"]) # make sure you specifically say lifeExp
+  
+  if(tmp < threshold){ # check if lifeExp is < 50
+    cat("avg life exp in ", icontininent, "less than", threshold,"\n") # if < 50, print this
+  } else {
+    cat("avg life exp in", icontininent, "greater than", threshold, "\n")
+  } # end if else condition
+  rm(tmp) # remove temporary to avoid weird memory storage stuff
+}
+
+
+
+
+
+```
+
