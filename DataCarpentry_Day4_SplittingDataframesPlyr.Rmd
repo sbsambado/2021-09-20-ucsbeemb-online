@@ -1,0 +1,195 @@
+---
+title: "DataCarpentry_SplittingCombiningDataframesPlyr"
+author: "sbsambado"
+date: "9/21/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+
+## Dataframe manipulation with `plyr` - Software Carpentry Workshop
+
+
+#### Agenda 
+
++ Big picture
++ Set up
++ Tools & Exercises 
++ Questions
++ Debrief  
+
+
+>[link to R for Reproducible Scientific Analysis material](https://swcarpentry.github.io/r-novice-gapminder/12-plyr/index.html)
+
+
+*heads up*: I tend to use a certain type of language while live coding 
+
++ function(argument) 
+
++ HINT: DATASET, COLUMN, VARIABLE, OBSERVATION
+
+
+**note: feel free to ask questions at any point during the lesson**
+
+
+
+
+
+### Big Picture
+
++ sometimes you need a lot of information to address your question
+
++ most times, all the information you need won't be in 1 dataframe
+
++ if you are working with multiple dataframes, you need to record where and how you combined them to get reproducible results
+
+
+### Set Up
+
+```{r setup, include=FALSE}
+
+# necessary packages
+
+# install.packages("plyr") for first timers!
+
+library(plyr) # load package
+
+
+# necessary dataframes
+
+  # Dataframe 1 -- from Carpentry
+gapminder <- read.csv("https://raw.githubusercontent.com/swcarpentry/r-novice-gapminder/gh-pages/_episodes_rmd/data/gapminder_data.csv", stringsAsFactors = TRUE) 
+
+
+# as always, look at your data before manipulating it
+
+str(gapminder)
+
+
+```
+
+
+### Tools & Exercises
+
+![plyr](./plyr_graphic.png)
+
+
+**The plyr manta: split - apply - combine**
+
+1. A *splitting* operation
+2. *Apply* a function on each split in turn
+3. *Recombine* output data as a single data object
+
+
+But really, there are 9 core functions that follow XXply name structure
+
++ the functions are named based on data structure for input & output
+
++ *input* structure could be --> array, dataframe, list, n replicates, function arguments
+
++ *output* structure could be --> array, dataframe, list, nothing
+
+![plyr functions](./plyr_functions.png)
+
+
+#### quick rules
+
+XXply(.data, .variables, .fun)
+
++ first X is input, second X is output
++ .data -- data object to be processed
++ .variables -- identify splitting variables
++ .fun -- function to be called on each piece 
+
+```{r}
+library(plyr)
+
+# What is the mean GDP per continent?
+ddply(
+ .data = calcGDP(gapminder), # function we made from yesterday
+ .variables = "continent",
+ .fun = function(x) mean(x$gdp)
+)
+```
+
+Challenge: What is the average life expectancy per continent?
+
+```{r}
+ddply(
+  .data = gapminder,
+  .variable = "continent",
+  .fun = function(x) mean(x$lifeExp)
+)
+
+
+# what if I wanted to make into a list as an output
+
+dlply(
+  .data = gapminder, 
+  .variable = "continent",
+  .fun = function(x) mean(x$lifeExp)
+)
+```
+
+what if you wanted to combine by multiple groups? (i.e. continent and year)
+```{r}
+ddply(
+  .data = gapminder,
+  .variable = c("continent", "year"),
+  .fun = function(x) mean(x$lifeExp)
+)
+
+# what would that look like as an array?
+
+daply(
+  .data = gapminder,
+  .variable = c("continent", "year"),
+  .fun = function(x) mean(x$lifeExp)
+)
+```
+Let's put some for loops in this
+
+```{r}
+# what is the mean gdpPercap for each continent and we want to print out these results in a reader friendly way 
+
+d_ply(
+  .data = gapminder,
+  .variables = "continent",
+  .fun = function(x) { 
+    meanGDPperCap <- mean(x$gdpPercap) # calculate mean
+    print(paste( # print out things of intererst
+      "The mean gdp per capita for", unique(x$continent),
+      "is", format(meanGDPperCap, big.mark = ",")
+    ))
+  }
+)
+
+
+?format()
+```
+
+Challenge 2: calculate the average life expectancy per continent and year. Which had the longest and shortest in 2007?
+
+```{r}
+solution <- ddply(
+  .data = gapminder,
+  .variables = c("continent", "year"),
+  .fun = function(x) mean(x$lifeExp)
+)
+
+str(solution)
+
+# longest life expect?
+
+# HINT: DATAFRAM
+
+solution[solution$year == 2007,]
+
+XXplyr
+
+
+
+```
+
